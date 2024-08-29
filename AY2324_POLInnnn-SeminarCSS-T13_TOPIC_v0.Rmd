@@ -1,0 +1,571 @@
+---
+title: "Topic 13 Seminar"
+subtitle: "More Distributions and Rmarkdown"
+author: "Kevin Fahey and Scott Moser"
+date: ""
+citation_package: biblatex
+biblatex: true
+link-citations: true
+link-bibliography: true
+output:
+  bookdown::html_document2:
+    # css: ["~/Dropbox/LaTeX/Stationary/Rmakrdown/seminar_v5.css", "~/Dropbox/LaTeX/Stationary/Rmakrdown/letteredSectionHeader.css"]
+    css: ["~/Dropbox/LaTeX/Stationary/Rmakrdown/seminar_v5.css", "~/Dropbox/LaTeX/Stationary/Rmakrdown/columns.css"]
+    biblio-style: "apalike"
+    number_sections: false  #true
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    pagetitle: Habits
+    df_print: paged
+    pandoc_args: [
+      "--filter=pandoc-xnos",
+      "--citeproc",
+      "--bibliography", "~/Dropbox/Bibliog/scottAll5-BBL-URLdoi2023.bib",
+      "--bibliography", "~/Dropbox/Bibliog/KFcurrent.bib"
+      ]
+    keep_md: false
+    keep_tex: true
+    autosize: true
+  bookdown::pdf_document2:
+    biblio-style: "apalike"
+    number_sections: true
+    includes:
+       in_header: columns.tex #["~/Dropbox/LaTeX/Stationary/Rmakrdown/letteredSectionHeader.tex"]
+    pandoc_args: [
+      "--citeproc",
+      "--bibliography", "~/Dropbox/Bibliog/scottAll5_BBL-URLdoi2023.bib",
+      "--bibliography", "~/Dropbox/Bibliog/KFcurrent.bib",
+      "--standalone"
+      ]
+fontfamily: mathpazo
+fontsize: 12pt
+geometry: margin=1in
+header-includes: 
+  - \linespread{1.05}
+  - \usepackage{graphicx}
+  - \usepackage{bm}
+  - \usepackage{float}
+  - \usepackage{dcolumn}
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{array}
+  - \usepackage{multirow}
+  - \usepackage{amsthm}
+  - \usepackage{amsmath}
+  - \usepackage{amsfonts}
+  - \usepackage{amscd}
+  - \usepackage{amssymb}
+  - \usepackage{placeins}
+  - \titleformat{\section}{\normalfont\Large\bfseries}{}{0em}{#1\ \thesection}
+    - \usepackage[explicit]{titlesec}
+    - \usepackage{multicol}
+subparagraph: yes
+# latex_engine: xelatex
+linkcolor: dullmagenta
+citecolor: Maroon
+filecolor: red
+urlcolor: blue
+---
+
+
+```{r setupKF, include=FALSE, eval=FALSE}
+knitr::opts_chunk$set(fig.path="figure/graphics-", 
+                      cache.path="cache/graphics-", 
+                      fig.align="center",
+                      external=TRUE,
+                      warning=FALSE,
+                      fig.pos="H",
+                      number_sections = FALSE)
+
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE) #fig.path="~/Dropbox/teaching/Notts/figures/", base.dir="~/Dropbox/teaching/Notts/figures/")
+knitr::opts_knit$set(root.dir = 					 "~/Dropbox/teaching/Notts/QSTEP/dataSets/data-teaching/") #"~/Dropbox/teaching/Notts/figures/") 
+options(tinytex.verbose = TRUE)
+```
+
+<!-- NOTES: (1)custom placement of Endnotes only works for `html_document(2)` -- not pdf_document   (2) boxes added -> uses `\usepackage{framed}` for LaTeX-ing -- see https://bookdown.org/yihui/rmarkdown-cookbook/custom-blocks.html  (3)    -->
+
+```{css, echo=FALSE}
+
+/* Whole document: */
+body{
+  font-family: Helvetica;
+  font-size: 12pt;
+}
+```
+
+
+
+
+
+
+
+# Part B: Demonstration {-}
+
+## Objectives
+
+In this week’s seminar (and out-of-class) activities we focus on three main themes:
+
+1.  Thinking through probability distributions -- and making our own!
+
+2.  Working with `tidyverse()` tools to replicate Summary Statistics Tables
+
+3.  Using math as an ally!
+
+After completing each section, take the time to write up discussion and analysis of what you've done outside the code chunks. Practice integrating the text-editor and R-analysis functions of RMarkdown. Create for yourself two files/sections: a *glossary* with key concepts and terms used this week and; a list of *commands* (R: and/or Rmarkdown and/or Shiny/plotly, etc.). For example:
+
+1.  What is the Central Limit Theorem?
+2.  What is a sampling distribution?
+3.  How would you use the `filter()` and `select()` functions in the `tidyverse` package with piping (`%>%`)?
+
+```{r}
+
+```
+
+## Rmarkdown Tips and Tricks
+
+1. 'From scratch'
+2. Tools -> Keyboard Shortcuts Help
+3. Auto-insert code chunk (Cntr + Alt + i)
+4. Rmd and panes in Rstudio
+  - Console vs. Render
+5. 'Run to here'
+
+\
+\
+\
+\
+
+# Part C: Distributions and Descriptives {.tabset}
+
+## Demonstration of Distributions {.tabset}
+
+[Follow this link](https://kevinfahey.shinyapps.io/Seminar_2_Distributions/) and return to the discussion of the distributions we've seen before.
+
+Today, focus on the commands needed to create your own distribution. Once you've looked through them all, you will design your own distribution in R. I'll ''demo'' the F distribution -- which you can create with `rf()` and then you will adopt this approach for your own distribution, using your own parameters.
+
+First, don't forget to make your preamble!
+
+```{r preamble, message = F, warning = F}
+rm(list = ls())
+
+library(tidyverse)
+```
+
+```{r test_distribution, message = F, warning = F}
+test <- rf(n = 1000, df1 = 20, df2 = 40)
+
+```
+
+We can create a histogram to show this distribution.
+
+```{r test_histogram, message = F, warning = F}
+hist(test, breaks = 100, col = "dodgerblue3", 
+     main = "", xlab = "Value")
+```
+
+And we can obtain summary statistics from this distribution as well:
+
+```{r test_descriptives, message = F, warning = F}
+min(test)
+max(test)
+mean(test)
+var(test)
+sd(test)
+length(test)
+```
+
+Indeed, these descriptive statistics form the basis of the Descriptive Statistics Table you will produce in the next section.
+
+What we're going to do now is employ our new knowledge of *probability theory* to explore this distribution in further detail. Following our discussion of probability, we will explore the following questions:
+
+\
+\
+\
+
+### What is the probability of obtaining a value higher than our *mean* value of `test`?
+
+Here is one way we can go about it. We can use the `filter()` and `length()` commands to create a second vector that is only those values larger than the mean, and then set the length of the second -- smaller -- vector as a proportion of the length of the first -- larger -- vector.
+
+```{r probability_1, message = F, warning = F}
+test2 <- as.data.frame(test) %>%
+  filter(test > mean(test))
+length(test2$test)/length(test)
+```
+
+The probability of obtaining a value from our distribution higher than the *mean* value of our distribution may differ from the mean itself!
+
+Try this on your own distribution. What is the probability for you?
+
+\
+\
+\
+
+### What is the probability of getting a specific set of values?
+
+In future weeks, we will be interested in learning about the probability that a single draw from our population produces a statistic -- such as the mean -- that falls within a range of values of an underlying probability distribution.
+
+\
+\
+\
+\
+
+## Advanced Tables Design
+
+When reporting information from our summary statistics tables -- also known as descriptive statistics tables -- our aim is to provide the reader with a sense of your research question. This involves structuring the table to identify the dependent or outcome variable, the independent or predictor variable, and important statistics about each variable of interest.
+
+```{r preamble_elections, warning = F, message = F}
+
+# Clear everything from environment
+rm(list = ls())
+
+# Load packages
+library(tidyverse)
+library(broom)
+library(psych)
+library(kableExtra)
+```
+
+
+First, lets import a BES data-set via a SPSS file using the `foreign` library (be sure to install it if not already).  Make sure the data file is in your working directory.
+
+```{r warning=FALSE, error=FALSE, message=FALSE, eval=FALSE}
+library(foreign)
+bes1 <- read.spss("2017_GB_Constituency_Data.sav")
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+library(foreign)
+bes1 <- read.spss("~/Dropbox/teaching/Notts/QSTEP/dataSets/data-teaching/BES-2017-F2F/2017_GB_Constituency_Data.sav")
+```
+
+
+So we've imported the data, but can we view it?  What type of object if `bes1`? 
+```{r warning=FALSE, error=FALSE, message=FALSE}
+class(bes1)
+```
+
+Hmm... this isn't right.  `bes1` is a _list_ but we want a data-set.
+
+Can you import the `.sav` file as a `data.frame`?  Hint:  use `?read.spss` to find out how optional arguments.
+
+---
+
+
+Once we have loaded the constituency data as a data.frame, lets look the variables it contains. (I'm only going to show the first 20 variables names here because there are literally hundreds of variables in this data set.)
+
+```{r warning=FALSE, error=FALSE, message=FALSE, eval=FALSE}
+bes1 <- read.spss("2017_GB_Constituency_Data.sav", to.data.frame=TRUE) 
+names(bes1)
+```
+
+```{r warning=FALSE, error=FALSE, message=FALSE, echo=FALSE}
+bes1 <- read.spss("~/Dropbox/teaching/Notts/QSTEP/dataSets/data-teaching/BES-2017-F2F/2017_GB_Constituency_Data.sav", to.data.frame=TRUE) 
+head(names(bes1), 20) 
+```
+
+Hmm.... these variable names don't look very informative.  However, if you `View()` the data, you see that variables have more informative labels e.g. `Con1517` looks to be "2015-17 Conservative vote share change."  We can extract all these variable labels as follows.
+
+```{r warning=FALSE, error=FALSE, message=FALSE}
+### Get variable labels
+dataset.labels <- as.data.frame(attr(bes1, "variable.labels")) 
+```
+
+## Descriptive Statistics {.unnumbered}
+
+We could use `summary()` to summarize our data.
+
+```{r warning=FALSE, error=FALSE, message=FALSE, results='hide'}
+###### Summarize
+summary(bes1)
+```
+
+
+Oof! If you (successfully) executed these commands, you'll see a whole lot of summary statistics.  But it doesn't look very 'accessible.'  At least, we can do better using `describe()` and `describeBy()`.
+
+```{r warning=FALSE, error=FALSE, message=FALSE, results='hide'}
+##### Summarize nicer
+library(psych)  ## install.packages(psych)  if not already
+describe(bes1)
+```
+
+This summarizes each variable in the `bes1` data set (=`data.frame` in this case) in a number of ways: mean, median, number of observations, etc. etc. 
+
+We can go further, by summarizing e.g. party vote-change from 2015-2017 _constituent by constituency_ using the `group_by()` function in the tidyverse.  (I am only going to show the first 10 constituencies, but you can view all 632 of them.)
+
+
+
+```{r}
+
+
+# Load in dataset and subset
+election1 <- bes1 %>%
+  select(ONSConstID, ConstituencyName, Country, Region, Con17, 
+         Lab17, LD17, SNP17, PC17, UKIP17, Green17, Majority17,
+         Turnout17) %>%
+  as_tibble()
+kable(describe(election1,
+               skew = F,
+               ranges = F), 
+      digits = 2, 
+      caption = "Summary, 2017 General Election Constituency Data",
+      col.names = c("Variable Order", "Observations", "Mean",
+                    "Standard Deviation", "Standard Error"))
+
+```
+
+Is this useful? What would we *actually* want for the reader? Ideally, we would provide statistics in an easily-digestible format. In order to do this, we need to wrangle our data into a few meaningful statistics. Fortunately, a few commands from the `tidyverse()` library can help us! We will use `filter` and `select` to choose the observations and variables we find most interesting, and the piping command `%>%` to link several commands together. Suppose we wanted to construct a table that looked at Scottish parliamentary constituencies, and only look at vote share and turnout for the top three parties.
+
+```{r assessment_1, message = FALSE, warning = FALSE}
+election_scotland <- election1 %>% 
+  dplyr::filter(Country == "Scotland") %>%
+  dplyr::select(Con17, Lab17, SNP17, Turnout17)
+# Fun story -- "turnout" for 2010 is called "turn10" instead of "Turnout10"
+
+kable(describe(election_scotland), digits = 2, caption = "Summary Statistics of Scottish Parliamentary Constituencies, 2017 General Elections")
+```
+
+Further, we may not be interested in all of these statistics -- so we need to dig into the `describe` command to remove statistics we do not want published.
+
+```{r assessment_2, message = FALSE, warning = FALSE}
+scotland_out_truncated <- describe(election_scotland, skew = F, ranges = F)
+kable(scotland_out_truncated, digits = 2, caption = "(Fewer) Summary Statistics of Scottish Parliamentary Constituencies, 2010-2017 General Elections")
+```
+
+All that's left for you to figure out is how to remove the `vars` statistic. Play around with the `kable` and `describe` commands and, using `filter` and `select`, see if you can remove that variable. Remember to focus on the objects you are creating. Next week we will show how to make further edits to these tables.
+
+\
+\
+\
+\
+
+## Math Practice
+
+We've done a number of ''canned'' functions so far this year, but now we are going to introduce some simple-to-access programming functions. Today, we will design two functions to obtain statistics.
+
+First, we will calculate the variance of a small vector by hand.
+
+```{r math_one, message = F, warning = F}
+vector <- rpois(8, 2)
+variance_one <- sum((vector[1] - mean(vector))^2,
+                    (vector[2] - mean(vector))^2,
+                    (vector[3] - mean(vector))^2,
+                    (vector[4] - mean(vector))^2,
+                    (vector[5] - mean(vector))^2,
+                    (vector[6] - mean(vector))^2,
+                    (vector[7] - mean(vector))^2,
+                    (vector[8] - mean(vector))^2)/(length(vector) - 1)
+variance_one
+```
+
+We can compare our performance to the 'canned' function. If we get a value of `0`, then we know for sure that the calculations were correct.
+
+```{r test_varianceone, message = F, warning = F}
+var(vector) - variance_one
+```
+
+The second thing we can do is create our own, [bespoke function](https://swcarpentry.github.io/r-novice-inflammation/02-func-R/). We'll do the same thing as before, but use the mathematical formula to our advantage. We will create this bespoke function, and then find the variance of our vector with it.
+
+Functions require us to input all of the ''moving parts'' and provide calculations for them. Observe this function for variance:
+
+```{r bespoke_function, message = F, warning = F}
+# Create function
+variance_bespoke <- function(populace){ # name function and parameters
+  x <- mean(populace) # define the mean
+  n <- length(populace) # define the sample size
+  input <- sum((populace - x)^2)/(n - 1) # create the variance calculation
+  input # output the variance value -- this value will appear in the console
+}
+
+# Implement function
+variance_bespoke(populace = vector)
+```
+
+Once we develop a bespoke function, we can use it for a variety of distributions. Create a new vector with one of your distributions, and call it `my_vector`. Ensure it has at least 10 observations. Then run it through the bespoke function, such that:
+
+```{r function_bespoke_2, eval = F}
+variance_bespoke(populace = my_vector)
+```
+
+And then compare it to the canned function, such that:
+
+```{r canned_function, eval = F}
+var(my_vector) - variance_bespoke(populace = my_vector)
+```
+
+Is the value zero? Are the two the same number?
+
+\
+\
+\
+\
+
+# Part D: Takehome exercises {.tabset}
+
+We will extend each component of the seminar materials by adding in new tasks. In each of these tasks, take advantage of RMarkdown to show off your ability to integrate plain-text editor functionality with r code chunk functionality.
+
+\
+\
+\
+\
+
+## Distributions
+
+We can start to think about what happens if we sample more than once from our population. This will be useful for Part E, and for next week, so this week we want to learn a bit about resampling. If we draw a sample from our `rf()` distribution again, and obtain the mean, nothing stops us from doing it again and again!
+
+```{r resampling_1, warning = F, message = F, eval = F}
+sample_1 <- rf(100, df1 = 3, df2 = 5)
+sample_2 <- rf(100, df1 = 3, df2 = 6)
+sample3 <- rf(100, df1 = 3, df2 = 7)
+```
+
+But the issue is that saving all of these vectors is computationally-inefficient and manual-intensive. There is an alternate method: we can use `forloops(){}`, a technique to iterate through a large number of tasks, with a specific goal in mind. An *iteration* is simply one in a series, e.g., the first draft is the first iteration of a book or article.
+
+The code to create a `forloop(){}` is simple:
+
+1.  Name the object into which you will be putting resampled data
+
+2.  Create the `forloop(){}` function line and input iterations
+
+3.  Create the functions inside the loop that will be iterated through
+
+4.  Create output for each iteration
+
+Within these four rules, there's a lot under your control. First, we will create a basic forloop. Observe the following and replicate on your own:
+
+```{r forloop_1, warning = F, message = F}
+samples <- matrix(NA, nrow = 100, ncol = 3)
+
+for(i in 1:3){
+  
+  samples[,i] <- rf(n = 100, df1 = 3, df2 = 6)
+  
+}
+View(samples)
+```
+
+But that merely repeats the same draw from the F distribution. What if we wanted to let the degrees-of-freedom parameters vary? Or the number of draws? We could set those as parameters as well.
+
+```{r forloop_2, warning = F, message = F}
+k <- 10 # set the number of draws
+n <- 100 # set the number of rows
+df1 <- 3 # set initial degrees of freedom for df1
+samples <- matrix(NA, nrow = n, ncol = k)
+
+for(i in 1:k){
+  # Now we set our rf parameters to vary with each iteration i
+  samples[,i] <- rf(n = n, df1 = (3 + i), df2 = (6 + (i^2)))
+}
+View(samples)
+```
+
+Play around with the parameters for a `forloop(){}` using your own distribution. Write up what the output looks like.
+
+\
+\
+\
+\
+
+## Advanced Tables
+
+Consider the table we created in Part C. We've currently combined the `knitr()` and `describe()` commands to produce our tables, but what if we wanted to split up the dynamic duo to make our tables look even nicer? Observe the following code, and replicate on your own:
+
+```{r elections_table_partd, warning = F, message = F}
+# Load in dataset
+election1 <- read.csv("2017_GB_Constituency_Data.csv") %>%
+  select(ONSConstID, ConstituencyName, Country, Region, Con17, 
+         Lab17, LD17, SNP17, PC17, UKIP17, Green17, Majority17,
+         Turnout17) %>%
+  as_tibble()
+
+# Run describe command, save as object
+elections_describe <- describe(election1, skew = F, ranges = F) %>%
+  select(n, mean, sd, se) %>%
+  rename(Obs = n,
+         Average = mean,
+         Standard_Deviation = sd,
+         Standard_Error = se)
+
+# Output as kable table
+kable(elections_describe, digits = 2, caption = "Summary, 2017 General Election Constituency Data")
+
+```
+
+Now that we know we can use `tidyverse()` commands to impact objects produced from `describe()`, use the functions from it you know -- `filter()`, `select()`, `group_by()`, `mutate()`, and `summarise()` -- to produce a new variable in this table.
+
+\
+\
+\
+\
+
+## Math Practice
+
+In this section, we are going to implement some simple commands that get you ''manual'' estimation of summary statistics of interest. These differ from bespoke functions; we're just building on existing objects manually. These can be excellent shorthand for future analysis, when if you need to know something quickly, you can implement a command and get the answer.
+
+We will also use the `sort()` command, which tells the vector to reorganize itself from the minimum value to the maximum value.
+
+```{r math_camp_partd, message = F, warning = F}
+# Create our vector to work with
+vector <- rpois(8, 2)
+
+manual_sum <- vector[1] + vector[2] + vector[3] + vector[4] + vector[5] +
+  vector[6] + vector[7] + vector[8]
+manual_mean <- sum(vector)/length(vector)
+manual_min <- head(sort(vector), 1)
+manual_max <- tail(sort(vector), 1)
+manual_range <- tail(sort(vector), 1) - head(sort(vector), 1)
+```
+
+You can start to combine these commands together to produce complex statistical output. Try to make the mean, min, max, and range for your own distribution.
+
+And then try to create the `median()` and the `mode()` -- would you include these given the distribution you chose? Why or why not? Write up in the code.
+
+\
+\
+\
+\
+
+# Part E: Central Limit Theorem
+
+In the final section, we briefly demonstrate and practice the Central Limit Theorem. One of the benefits of the CLT is that the means of each sample, when arrayed in a vector known as a sampling distribution (a probability distribution obtained through repeated sampling), are normally distributed about our population mean. Observe:
+
+```{r clt, message = F, warning = F}
+# We create our population from a binomial distribution
+population <- rbinom(1000, 1, 0.5)
+
+# We will store our sample means in this vector
+sample_means <- NA
+
+# We will use a forloop to generate our samples and sample means
+for(i in 1:50){
+  
+  sample_means[i] <- mean(sample(population, size = 30, replace = F))
+  
+}
+
+hist(sample_means, breaks = 20, col = "firebrick4")
+```
+
+The mean of our sample means and the mean of our population mean almost perfectly match up.
+
+
+
+---
+
+---
+
+
+<center>
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+</center>
+
+---
+
+<!-- --- -->
+<!-- ## References -->
+# References {-}
+
+
